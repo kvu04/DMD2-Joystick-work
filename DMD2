@@ -1,0 +1,61 @@
+#include <SPI.h>
+#include <DMD2.h>
+#include <fonts/SystemFont5x7.h>
+
+SoftDMD dmd(1,1);  // DMD controls the entire display
+
+// Arduino pin numbers
+const int SW_pin = 2; // digital pin connected to switch output
+const int X_pin = 0; // analog pin connected to X output
+const int Y_pin = 1; // analog pin connected to Y output
+
+int y = 0;
+int x = 0;
+void setup() {
+  pinMode(SW_pin, INPUT);
+  digitalWrite(SW_pin, HIGH);
+  Serial.begin(9600);
+  dmd.setBrightness(255);
+  dmd.begin();
+  dmd.setPixel(x,y,GRAPHICS_ON);
+}
+
+
+
+void movetest(){
+  //dmd.setPixel(x,y,GRAPHICS_ON);
+  int input_x = analogRead(X_pin);
+  int input_y = analogRead(Y_pin);
+  if (input_x == 0 and x<31 and x>=0){
+    dmd.movePixels(x,y,x+1,y,31,15);
+    x++;
+  };
+  if (input_x ==1023 and x<=31 and x>0){
+    dmd.movePixels(x,y,x-1,y,31,15);
+    x--;
+  };
+  if (input_y == 0 and y<15 and y>=0){
+    dmd.movePixels(x,y,x,y+1,31,15);
+    y++;
+  };
+  if (input_y == 1023 and y<=15 and y>0){
+    dmd.movePixels(x,y,x,y-1,31,15);
+    y--;
+  }
+}
+
+
+void loop() {
+  Serial.print("Switch:  ");
+  Serial.print(digitalRead(SW_pin));
+  Serial.print("\n");
+  Serial.print("X-axis: ");
+  Serial.print(analogRead(X_pin));
+  Serial.print("\n");
+  Serial.print("Y-axis: ");
+  Serial.println(analogRead(Y_pin));
+  Serial.print("\n\n");
+  movetest();
+  
+  delay(100);
+}
